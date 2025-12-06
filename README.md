@@ -1,8 +1,3 @@
-Voici une proposition de fichier `README.md` structuré et professionnel pour votre dépôt GitHub.
-
-[cite_start]Comme le sujet précise que **le code doit être en anglais**[cite: 17], il est fortement recommandé (et standard dans l'industrie) de rédiger le `README` en anglais également.
-
-J'ai inclus toutes les fonctionnalités demandées dans le TP, des commandes de base jusqu'à la gestion des processus en arrière-plan.
 
 -----
 
