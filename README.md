@@ -44,7 +44,7 @@ In accordance with the project guidelines:
 ### 1\. Clone the repository
 
 ```bash
-git clone https://github.com/[YOUR_USERNAME]/enseash.git
+git clone https://github.com/zeroxy21/enseash.git
 cd enseash
 ```
 
