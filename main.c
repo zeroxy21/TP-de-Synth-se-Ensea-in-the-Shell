@@ -13,13 +13,10 @@ int main(int argc, char *argv[]) {
     while (1) {
    
         print("enseash%");
-        //pour etre safe on prends un type ssize [-1,2¹5-1]
+        //to be safe we take a type ssize [-1,2¹5-1]
         ssize_t size = read_entry(buffer);
+        //to filter spaces
         char* commande =strtok(buffer," \n");  
-
-        if(strcmp(commande,"fortune")==0){
-            fortune();
-        }
 
 
 
@@ -28,6 +25,22 @@ int main(int argc, char *argv[]) {
             exit(EXIT_SUCCESS);
         }
 
+        //extern commands 
+        else {
+
+
+
+
+            if(strcmp(commande,"fortune")==0){
+                fortune();
+            }   
+
+
+
+
+
+
+        }
   
 
 
