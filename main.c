@@ -12,12 +12,18 @@ int main(int argc, char *argv[]) {
 
     while (1) {
    
-        print("enseash/%");
-
+        print("enseash%");
+        //pour etre safe on prends un type ssize [-1,2¹5-1]
         ssize_t size = read_entry(buffer);
+        char* commande =strtok(buffer," \n");  
+
+        if(strcmp(commande,"fortune")==0){
+            fortune();
+        }
 
 
-        if (strcmp(buffer, "exit") == 0) {
+
+        if (strcmp(commande, "exit") == 0) {
             print("Bye bye...\n");
             exit(EXIT_SUCCESS);
         }
