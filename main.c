@@ -1,59 +1,20 @@
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
+
 #include "utils.h" 
-#include <sched.h>
+
+int status;
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
     char buffer[BUFFER_SIZE];
+    
 
     print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
+
       while (1) {
-   
-        print("enseash%");
-        //to be safe we take a type ssize [-1,2¹5-1]
-        ssize_t size = read_entry(buffer);
-        //to filter spaces
-        char* commande =strtok(buffer," \n");  
-
-        if (strcmp(commande, "exit") == 0) {
-            print("Bye bye...\n");
-            exit(EXIT_SUCCESS);
-        }
-
-        //extern commands 
-        else {
-
-            if(strcmp(commande,"fortune")==0){
-                fortune();
-            }   
-            // clone the shell
-            pid_t pid = fork();
-
-            if (pid == -1) {
-                perror("Erreur fork"); // in case of an error
-            } 
-            else if (pid == 0) {
-                // ===(CHILD) ===
-                // execlp cherche 'commande' dans le PATH
-                // we use command two times: 
-                // 1 time for the path , 1 time for the command
-                execlp(commande, commande, (char *)NULL);
-
-                // if the code gets here then the command is not found
-                perror("Erreur d'execution");
-                exit(EXIT_FAILURE); // properly kill the child
-            } 
-            else {
-                // === (PARENT/SHELL) ===
-                // the shell is waiting that the child is finished
-                int status;
-                waitpid(pid, &status, 0);
-            }
-
-        }
-
+        print_prompt();
+        ssize_t size = process_entry(buffer);
+        char* command =build_command(buffer);
+        execute_prompt(command);
     }
 
     return 0;

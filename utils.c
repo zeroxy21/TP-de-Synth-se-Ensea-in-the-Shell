@@ -1,44 +1,121 @@
-
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#define BUFFER_SIZE 1024
+#include "utils.h" 
+extern int status;
 
 
 
 void print(char* str){
-    write(STDOUT_FILENO,str,strlen(str));
+    write(STDOUT_FILENO, str, strlen(str));
 }
 
 
-int read_entry(char* buffer){
-    //we use the type ssize to have -1 to MAX/2 , we need the -1 in case of an error of read
+int process_entry(char* buffer){
     ssize_t ret = read(STDIN_FILENO, buffer, BUFFER_SIZE - 1); 
 
-    //if there is nothing left to read
+   
     if (ret == 0) {        
         exit(EXIT_SUCCESS); 
-    } else if (ret < 0) {
-        //in case of an error from the read function
+    } 
+    
+    else if (ret < 0) {
+   
         print("Erreur de lecture\n");
         exit(EXIT_FAILURE);
     }
     
-    //we have to check eventual returns to line 
     if (buffer[ret - 1] == '\n') {
         buffer[ret - 1] = '\0';
 
-    } else {
-        //if there are no return to line then we juste check that the String ends properly
+    } 
+    else {
         buffer[ret] = '\0';
     }
 
     return ret;
 }
 
-void fortune(void){
-    print("Today is what happened to yesterday\n");
+char* build_command(char*buffer){
+    return strtok(buffer," \n");  
+
+}
+
+char* build_prompt() {
+    static char buffer[MAX_STATUS_MSG_SIZE]; 
+
+
+    const char *first_part = "enseash[";
+    const char *exit_str = "EXIT:";
+    const char *sig_str = "SIG:"; 
+    const char *last_part = "]%";
+
+    if (WIFEXITED(status)) {
+
+        int result_of_the_child = WEXITSTATUS(status);
+        
+        // Construct the final string safely: "enseash[" + "EXIT:" + number + "]%"
+        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s", 
+                           first_part, exit_str, result_of_the_child, last_part);
+        
+     
+        if (len < 0 || len >= MAX_STATUS_MSG_SIZE) {
+            return NULL; 
+        }
+
+        return buffer;
+    } 
+    else if (WIFSIGNALED(status)) {
+        int process_killer = WTERMSIG(status);
+        
+        // Construct the final string safely: "enseash[" + "SIG:" + number + "]%"
+        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s", 
+                           first_part, sig_str, process_killer, last_part);
+
+        if (len < 0 || len >= MAX_STATUS_MSG_SIZE) {
+            return NULL; 
+        }
+
+        return buffer;
+    }
+    
+    
+    else {
+        snprintf(buffer, MAX_STATUS_MSG_SIZE, "%sUNKNOWN]%s", first_part, last_part);
+        return buffer;
+    }
+}
+
+void print_prompt(){
+    
+    print(build_prompt());
+
     
 }
 
 
+
+        
+void execute_prompt(char* command){
+
+    if (strcmp(command, "exit") == 0) {
+        print("Bye bye...\n");
+        exit(EXIT_SUCCESS);
+    }
+    else {
+        pid_t pid = fork();
+
+        if (pid == -1) {
+            perror("Erreur fork");
+        } 
+        else if (pid == 0) {
+            // ===(CHILD) ===
+            execlp(command, command, (char *)NULL);
+            perror("Erreur d'execution");
+            exit(EXIT_FAILURE); 
+        } 
+        else {
+            // === (PARENT/SHELL) ===
+            waitpid(pid, &status, 0);
+        }
+
+    }
+
+}
