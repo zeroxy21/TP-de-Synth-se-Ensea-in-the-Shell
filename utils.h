@@ -6,10 +6,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <time.h>
+#include <sys/time.h>
 
 #define BUFFER_SIZE 1024
 #define MAX_STATUS_MSG_SIZE 30
-
 
 
 void print(char* str);

@@ -1,7 +1,7 @@
 #include "utils.h" 
+
 extern int status;
-
-
+struct timespec start, end;
 
 void print(char* str){
     write(STDOUT_FILENO, str, strlen(str));
@@ -38,36 +38,52 @@ char* build_command(char*buffer){
 
 }
 
+
 char* build_prompt() {
+    
+    double time_diff_ms;
+
     static char buffer[MAX_STATUS_MSG_SIZE]; 
-
-
     const char *first_part = "enseash[";
     const char *exit_str = "EXIT:";
     const char *sig_str = "SIG:"; 
-    const char *last_part = "]%";
+    const char * middle_part=" |";
+    const char *last_part = "ms ]%";
 
-    if (WIFEXITED(status)) {
+    
+    if(WIFEXITED(status)) {
 
         int result_of_the_child = WEXITSTATUS(status);
+
+
         
-        // Construct the final string safely: "enseash[" + "EXIT:" + number + "]%"
-        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s", 
-                           first_part, exit_str, result_of_the_child, last_part);
+        time_diff_ms=(end.tv_sec - start.tv_sec) * 1000.0 + 
+                (end.tv_nsec - start.tv_nsec) / 1000000.0;
+
+
+        // "enseash[" + "EXIT:" + number + "]%"
+        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s%.1f%s", 
+                           first_part, exit_str, result_of_the_child,middle_part,time_diff_ms, last_part);
         
      
         if (len < 0 || len >= MAX_STATUS_MSG_SIZE) {
             return NULL; 
         }
+        
 
         return buffer;
     } 
     else if (WIFSIGNALED(status)) {
         int process_killer = WTERMSIG(status);
-        
+
+      
+        time_diff_ms=(end.tv_sec - start.tv_sec) * 1000.0 + 
+                (end.tv_nsec - start.tv_nsec) / 1000000.0;
+
+
         // Construct the final string safely: "enseash[" + "SIG:" + number + "]%"
-        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s", 
-                           first_part, sig_str, process_killer, last_part);
+        int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s%.1f%s", 
+                           first_part, sig_str, process_killer,middle_part,time_diff_ms, last_part);
 
         if (len < 0 || len >= MAX_STATUS_MSG_SIZE) {
             return NULL; 
@@ -95,6 +111,8 @@ void print_prompt(){
         
 void execute_prompt(char* command){
 
+    clock_gettime(CLOCK_MONOTONIC,&start);
+    
     if (strcmp(command, "exit") == 0) {
         print("Bye bye...\n");
         exit(EXIT_SUCCESS);
@@ -117,5 +135,8 @@ void execute_prompt(char* command){
         }
 
     }
-
+    clock_gettime(CLOCK_MONOTONIC,&end);
 }
+
+
+
