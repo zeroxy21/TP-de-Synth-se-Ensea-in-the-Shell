@@ -5,7 +5,7 @@ int status;
 
 int main(int argc, char *argv[]){
     char buffer[BUFFER_SIZE];
-    
+    char* args[MAX_ARGS];
 
     print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
 
@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
         
         print_prompt();
         ssize_t size = process_entry(buffer);
-        char* command =build_command(buffer);
+        char** command =build_command(buffer,args);
         execute_prompt(command);
 
     }

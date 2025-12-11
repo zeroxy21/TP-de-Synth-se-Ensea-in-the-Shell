@@ -33,8 +33,22 @@ int process_entry(char* buffer){
     return ret;
 }
 
-char* build_command(char*buffer){
-    return strtok(buffer," \n");  
+char** build_command(char*buffer, char* args[]){
+    int i = 0;
+    //strtok parses a String into tokens following the list of delimiters given , here " " and "\n"
+    char *token = strtok(buffer, " \n");
+    
+    
+    while (token != NULL) {
+        
+        args[i] = token; 
+        i++;
+        
+        if (i >= MAX_ARGS - 1) break; 
+        token = strtok(NULL, " \n");
+    }
+    args[i] = NULL;
+    return args ;  
 
 }
 
@@ -70,13 +84,13 @@ char* build_prompt() {
             return NULL; 
         }
         
-
         return buffer;
+
     } 
+
     else if (WIFSIGNALED(status)) {
         int process_killer = WTERMSIG(status);
 
-      
         time_diff_ms=(end.tv_sec - start.tv_sec) * 1000.0 + 
                 (end.tv_nsec - start.tv_nsec) / 1000000.0;
 
@@ -97,6 +111,7 @@ char* build_prompt() {
         snprintf(buffer, MAX_STATUS_MSG_SIZE, "%sUNKNOWN]%s", first_part, last_part);
         return buffer;
     }
+
 }
 
 void print_prompt(){
@@ -109,11 +124,11 @@ void print_prompt(){
 
 
         
-void execute_prompt(char* command){
+void execute_prompt(char** command){
 
     clock_gettime(CLOCK_MONOTONIC,&start);
     
-    if (strcmp(command, "exit") == 0) {
+    if (strcmp(command[0], "exit") == 0) {
         print("Bye bye...\n");
         exit(EXIT_SUCCESS);
     }
@@ -125,7 +140,7 @@ void execute_prompt(char* command){
         } 
         else if (pid == 0) {
             // ===(CHILD) ===
-            execlp(command, command, (char *)NULL);
+            execvp(command[0], command);
             perror("Erreur d'execution");
             exit(EXIT_FAILURE); 
         } 
@@ -135,7 +150,9 @@ void execute_prompt(char* command){
         }
 
     }
+
     clock_gettime(CLOCK_MONOTONIC,&end);
+    
 }
 
 

@@ -11,11 +11,11 @@
 
 #define BUFFER_SIZE 1024
 #define MAX_STATUS_MSG_SIZE 30
-
+#define MAX_ARGS 64
 
 void print(char* str);
 void print_prompt();
 int process_entry(char* buffer);
 char* build_prompt();
-void execute_prompt(char* command);
-char* build_command(char*buffer);
+void execute_prompt(char** command);
+char** build_command(char*buffer,char* args[]);
