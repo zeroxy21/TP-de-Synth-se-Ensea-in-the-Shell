@@ -1,27 +1,28 @@
-# Compilateur et options
+# Compilateur
 CC = gcc
-CFLAGS = -Wall -Wextra -g # Affiche tous les warnings et ajoute les infos de debug
+
+CFLAGS = -Wall -Wextra -g -Iinc
 
 # Nom de l'exécutable final
 TARGET = enseash
 
-# Liste des fichiers sources
-SRCS = main.c utils.c
+# Liste des fichiers sources avec leur chemin relatif
+SRCS = src/main.c src/utils.c
 
-# Transformation des .c en .o (objets)
+# Transformation : src/main.c devient src/main.o
 OBJS = $(SRCS:.c=.o)
 
-# Règle par défaut (ce qui se lance quand on tape juste "make")
+# Règle par défaut
 all: $(TARGET)
 
-# Édition de liens (création de l'exécutable)
+# Édition de liens : assemble les .o pour créer l'exécutable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
-# Compilation des fichiers sources en objets
+# Compilation : transforme chaque .c (dans src/) en .o (dans src/)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Pour nettoyer les fichiers compilés (taper "make clean")
+# Nettoyage
 clean:
 	rm -f $(OBJS) $(TARGET)

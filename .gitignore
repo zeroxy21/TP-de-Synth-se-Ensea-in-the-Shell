@@ -1,0 +1,11 @@
+# --- Compilation C ---
+# Ignorer tous les fichiers objets partout
+*.o
+
+# --- Système / Editeurs ---
+# Mac
+.DS_Store
+# Windows
+Thumbs.db
+# VS Code
+.vscode/
