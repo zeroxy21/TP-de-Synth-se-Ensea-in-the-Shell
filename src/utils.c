@@ -38,7 +38,6 @@ char** build_command(char*buffer, char* args[]){
     //strtok parses a String into tokens following the list of delimiters given , here " " and "\n"
     char *token = strtok(buffer, " \n");
     
-    
     while (token != NULL) {
         
         args[i] = token; 
@@ -48,9 +47,26 @@ char** build_command(char*buffer, char* args[]){
         token = strtok(NULL, " \n");
     }
     args[i] = NULL;
+
+
     return args ;  
 
 }
+/*O_WRONLY (Write Only) :
+
+Ouvre le fichier en mode Écriture seulement. Le processus pourra écrire dedans, mais pas lire ce qu'il contient.
+
+O_CREAT (Create) :
+
+Si le fichier n'existe pas, le système le crée. Sans cette option, si le fichier est absent, la commande open échouerait (retournerait -1).
+
+Note importante : C'est la présence de ce flag qui rend le 3ème paramètre (0644) obligatoire.
+
+O_TRUNC (Truncate) :
+
+Si le fichier existe déjà et qu'on l'ouvre avec succès, son contenu est effacé (taille remise à 0).
+
+C'est ce qui différencie le > (qui écrase tout) du >> (qui ajoute à la fin). Pour faire un >>, on remplacerait O_TRUNC par O_APPEND.*/
 
 
 char* build_prompt() {
@@ -122,10 +138,60 @@ void print_prompt(){
 }
 
 
+void redirect_and_filter_args(char** args){
 
+    for (int i = 0; args[i]!=NULL;i++){
+                
+        if(strcmp(args[i],"<")==0){
+            if (args[i+1] == NULL) {
+                print("Erreur: pas de fichier après <\n");
+                exit(EXIT_FAILURE);
+            }
+            args[i]=NULL;
+
+            int fd = open(args[i+1], O_RDONLY);
+                    
+            args[i+1]=NULL;
+
+            if (fd == -1) {
+                perror("open");
+                exit(1);
+                }
+
+            dup2(fd, STDIN_FILENO);
+                    
+            close(fd);
+                
+            }
+        if(strcmp(args[i],">")==0){
+            if (args[i+1] == NULL) {
+                print("Erreur: pas de fichier après >\n");
+                exit(EXIT_FAILURE);
+            }
+            args[i]=NULL;
+
+            int fd = open(args[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                    
+            args[i+1]=NULL;
+
+            if (fd == -1) {
+                perror("open");
+                exit(1);
+                }
+
+        dup2(fd, STDOUT_FILENO); 
+        close(fd);
+
+        }
+            }
+
+}
         
 void execute_prompt(char** command){
 
+    if (command[0] == NULL) {
+        return; 
+    }
     clock_gettime(CLOCK_MONOTONIC,&start);
     
     if (strcmp(command[0], "exit") == 0) {
@@ -140,6 +206,8 @@ void execute_prompt(char** command){
         } 
         else if (pid == 0) {
             // ===(CHILD) ===
+            //check redirections 
+            redirect_and_filter_args(command);
             execvp(command[0], command);
             perror("Erreur d'execution");
             exit(EXIT_FAILURE); 
@@ -154,6 +222,3 @@ void execute_prompt(char** command){
     clock_gettime(CLOCK_MONOTONIC,&end);
     
 }
-
-
-

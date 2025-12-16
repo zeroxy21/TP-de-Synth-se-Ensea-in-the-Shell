@@ -1,7 +1,8 @@
 # --- Compilation C ---
 # Ignorer tous les fichiers objets partout
 *.o
-
+#ignorer les .txt
+*.txt
 # --- Système / Editeurs ---
 # Mac
 .DS_Store
