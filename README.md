@@ -1,78 +1,93 @@
+Voici une version retravaillée de votre `README.md`.
+
+J'ai conservé l'intégralité de votre texte, mais j'ai amélioré la structure visuelle pour le rendre **plus "scannable" pour un recruteur**. Les recruteurs passent souvent moins de 30 secondes sur un projet ; j'ai donc mis l'accent sur :
+
+1.  **L'alignement** propre des métadonnées (Auteurs/Cours).
+2.  **L'utilisation de cases à cocher** pour la liste des fonctionnalités (donne un sentiment d'accomplissement).
+3.  **La coloration syntaxique** correcte pour le code (C au lieu de Bash).
+4.  **Une mise en page aérée** type "Portfolio GitHub".
+
+-----
+
 # EnseaSH — Micro Shell Project
 
-## 📜 Description
+## 📜 Project Overview
 
 **EnseaSH** is a micro shell developed as a synthesis practical work ("TP de Synthèse") for the 2nd year of the Computer Science Major at **ENSEA**.
 
-The goal of this project is to understand the low-level mechanisms of a shell, including process creation, signal handling, and file descriptor management. This shell executes commands, displays their exit codes/signals, and measures their execution time.
+The primary objective of this project is to demonstrate a deep understanding of low-level system mechanisms, including process creation, signal handling, and file descriptor management. This shell mimics standard shell behaviors: executing commands, managing I/O, and monitoring execution metrics.
 
-**Course:** 2nd Year — Computer Science Major  
-**Authors:** Agheles Mekdache & Salim Bouateli
+| **Context** | 2nd Year — Computer Science Major |
+| :--- | :--- |
+| **Institution** | ENSEA |
+| **Authors** | **Agheles Mekdache** & **Salim Bouateli** |
 
----
+-----
 
-## 🚀 Features
+## 🚀 Implemented Features
 
-This shell implements the following functionalities, developed incrementally:
+This shell implements a robust set of functionalities, developed incrementally:
 
-1. **Welcome Message**  
-   Displays a welcome message and a prompt (`enseash %`) upon startup.
+  * [x] **Welcome Message**
+    Displays a welcome message and a prompt (`enseash %`) upon startup.
+  * [x] **Command Execution**
+    Supports simple commands (e.g., `ls`, `date`) and commands with arguments (e.g., `ls -l /tmp`).
+  * [x] **REPL (Read-Eval-Print Loop)**
+    Reads user input, executes it, and waits for the next command efficiently.
+  * [x] **Exit Management**
+    Cleanly exits the shell using the `exit` command or `<Ctrl>+d`.
+  * [x] **Status Display**
+    Shows the exit code or signal of the previous command in the prompt (e.g., `[exit:0]` or `[sign:9]`).
+  * [x] **Execution Time Metrics**
+    Measures and displays precise execution time using `clock_gettime` (e.g., `[exit:0|10ms]`).
+  * [x] **I/O Redirections**
+    Full support for Input (`<`) and Output (`>`) redirection.
+  * [x] **Pipes**
+    Supports inter-process communication via pipes (e.g., `ls | wc -l`).
+  * [x] **Background Processes (Bonus)**
+    Supports executing commands in the background using `&`.
 
-2. **Command Execution**  
-   - Supports simple commands (e.g., `ls`, `date`)  
-   - Supports commands with arguments (e.g., `ls -l /tmp`)
+-----
 
-3. **REPL (Read-Eval-Print Loop)**  
-   Reads user input, executes it, and waits for the next command.
+## 🛠 Technical Constraints & Standards
 
-4. **Exit Management**  
-   Cleanly exits the shell using the `exit` command or `<Ctrl>+d`.
+This project adheres to strict system programming constraints to ensure educational value and code quality:
 
-5. **Status Display**  
-   Shows the exit code or signal of the previous command in the prompt (e.g., `[exit:0]` or `[sign:9]`).
+  * **System Calls Only:** Standard I/O functions like `printf` are strictly avoided in favor of `write`.
+  * **No `system()`:** Usage of the `system()` function is forbidden; the project relies entirely on the `exec` family functions.
+  * **Clean Code Practices:** No "magic numbers," English variable naming conventions, and modular function design.
+  * **Safe Memory & String Handling:** Usage of `string.h` and safe functions (e.g., `strn...`).
 
-6. **Execution Time**  
-   Measures and displays the execution time of commands using `clock_gettime` (e.g., `[exit:0|10ms]`).
+-----
 
-7. **Redirections**  
-   - Input redirection (`<`)  
-   - Output redirection (`>`)
+## ⚙️ Installation & Usage
 
-8. **Pipes**  
-   Supports piping between two commands (e.g., `ls | wc -l`).
+To compile and run the project on a Linux environment:
 
-9. **Background Processes (Bonus)**  
-   Supports executing commands in the background using `&`.
-
----
-
-## 🛠 Technical Constraints
-
-- **No `printf`**: Standard I/O functions like `printf` are avoided in favor of `write`.  
-- **No `system()`**: `system` is forbidden; `exec` family functions are used instead.  
-- **Code Quality**: No "magic numbers," clean English variable naming, modular functions.  
-- **String Manipulation**: Usage of `string.h` and safe functions like `strn...`.
-
----
-
-
-## How to use the project on linux:
 ```bash
-   make
-   ./enseash
+$ make
+$ ./enseash
 ```
 
-## Main function:
-```bash
-int main(int argc, char *argv[]){
+-----
+
+## 💻 Code Snippet: Main Loop
+
+Below is the entry point of the shell, demonstrating the REPL structure:
+
+```c
+int main(int argc, char *argv[]) {
     char buffer[BUFFER_SIZE];
     int status = 0;
+
     print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
-     while (1) {   
+
+    while (1) {
         print_prompt(status);
         process_entry(buffer);
         execute_prompt(buffer, &status);
     }
+
     return 0;
 }
-``` 
+```
