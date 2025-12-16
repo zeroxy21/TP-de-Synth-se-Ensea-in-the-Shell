@@ -1,13 +1,4 @@
-Voici une version retravaillée de votre `README.md`.
 
-J'ai conservé l'intégralité de votre texte, mais j'ai amélioré la structure visuelle pour le rendre **plus "scannable" pour un recruteur**. Les recruteurs passent souvent moins de 30 secondes sur un projet ; j'ai donc mis l'accent sur :
-
-1.  **L'alignement** propre des métadonnées (Auteurs/Cours).
-2.  **L'utilisation de cases à cocher** pour la liste des fonctionnalités (donne un sentiment d'accomplissement).
-3.  **La coloration syntaxique** correcte pour le code (C au lieu de Bash).
-4.  **Une mise en page aérée** type "Portfolio GitHub".
-
------
 
 # EnseaSH — Micro Shell Project
 
