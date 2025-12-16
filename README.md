@@ -56,12 +56,10 @@ This shell implements the following functionalities, developed incrementally:
 ---
 
 
-## Created functions:
+## How to use the project on linux:
 ```bash
-void print(char* str);
-int process_entry(char* buffer);
-char* build_prompt(int status);
-void execute_prompt(char* command, int* status_ptr);
+   make
+   ./enseash
 ```
 
 ## Main function:
