@@ -21,7 +21,7 @@ int process_entry(char* buffer){
         print("Erreur de lecture\n");
         exit(EXIT_FAILURE);
     }
-    
+    // Terminates the process if the Enter key is detected
     if (buffer[ret - 1] == '\n') {
         buffer[ret - 1] = '\0';
 
@@ -52,22 +52,12 @@ char** build_command(char*buffer, char* args[]){
     return args ;  
 
 }
-/*O_WRONLY (Write Only) :
 
-Ouvre le fichier en mode Écriture seulement. Le processus pourra écrire dedans, mais pas lire ce qu'il contient.
 
-O_CREAT (Create) :
-
-Si le fichier n'existe pas, le système le crée. Sans cette option, si le fichier est absent, la commande open échouerait (retournerait -1).
-
-Note importante : C'est la présence de ce flag qui rend le 3ème paramètre (0644) obligatoire.
-
-O_TRUNC (Truncate) :
-
-Si le fichier existe déjà et qu'on l'ouvre avec succès, son contenu est effacé (taille remise à 0).
-
-C'est ce qui différencie le > (qui écrase tout) du >> (qui ajoute à la fin). Pour faire un >>, on remplacerait O_TRUNC par O_APPEND.*/
-
+/* 
+The function builds the prompt string with exit status (EXIT/SIG) and time difference (ms).
+It uses WIFEXITED/WIFSIGNALED macros on 'status'.
+*/
 
 char* build_prompt() {
     
@@ -130,6 +120,7 @@ char* build_prompt() {
 
 }
 
+
 void print_prompt(){
     
     print(build_prompt());
@@ -137,6 +128,9 @@ void print_prompt(){
     
 }
 
+/*
+The function finds '<' or '>', opens the file, uses dup2 to redirect STDIN/STDOUT, and clears the args.
+*/
 
 void redirect_and_filter_args(char** args){
 
@@ -183,10 +177,15 @@ void redirect_and_filter_args(char** args){
         close(fd);
 
         }
+        //question 8 
+
+
+
             }
 
 }
         
+
 void execute_prompt(char** command){
 
     if (command[0] == NULL) {
@@ -206,7 +205,6 @@ void execute_prompt(char** command){
         } 
         else if (pid == 0) {
             // ===(CHILD) ===
-            //check redirections 
             redirect_and_filter_args(command);
             execvp(command[0], command);
             perror("Erreur d'execution");
