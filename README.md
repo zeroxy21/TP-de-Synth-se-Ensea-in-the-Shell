@@ -67,18 +67,25 @@ $ ./enseash
 Below is the entry point of the shell, demonstrating the REPL structure:
 
 ```c
-int main(int argc, char *argv[]) {
+#include "utils.h" 
+int status;
+
+
+int main(int argc, char *argv[]){
     char buffer[BUFFER_SIZE];
-    int status = 0;
+    char* args[MAX_ARGS];
+    
+    greetings();
 
-    print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
+      while (1) {
+    
+        print_prompt();
+        ssize_t size = process_entry(buffer);
+        char** command =build_command(buffer,args);
+        execute_prompt(command);
 
-    while (1) {
-        print_prompt(status);
-        process_entry(buffer);
-        execute_prompt(buffer, &status);
     }
 
     return 0;
-}
+  }
 ```
