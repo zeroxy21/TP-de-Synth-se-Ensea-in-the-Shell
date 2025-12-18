@@ -21,3 +21,5 @@ char* build_prompt();
 void execute_prompt(char** command);
 char** build_command(char*buffer,char* args[]);
 void redirect_and_filter_args(char** args);
+void build_and_execute_pipe(char** command); 
+bool check_pipe(char** command);

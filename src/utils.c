@@ -128,6 +128,82 @@ void print_prompt(){
     
 }
 
+void execute_pipe(char** cmd1, char** cmd2) {
+    int fd[2];
+    pipe(fd); 
+
+    // --- CHILD 1 ---
+    if (fork() == 0) {
+        close(fd[0]);       
+        dup2(fd[1], STDOUT_FILENO); 
+        close(fd[1]);       
+        
+        execvp(cmd1[0], cmd1);
+        exit(1);
+    }
+
+    // --- CHILD 2 ---
+    if (fork() == 0) {
+        close(fd[1]);       
+        dup2(fd[0], STDIN_FILENO); 
+        close(fd[0]);       
+        
+        execvp(cmd2[0], cmd2);
+        exit(1);
+    }
+
+    // --- FATHER ---
+   
+    close(fd[0]);
+    close(fd[1]);
+
+    wait(NULL);
+    wait(NULL);
+}
+
+bool check_pipe(char** command) {
+    for (int i = 0; command[i] != NULL; i++) {
+        if (strcmp(command[i], "|") == 0) {
+            return true;
+        }
+    }
+    return false; 
+}
+
+void build_and_execute_pipe(char** command) {
+    char* cmd1[MAX_ARGS];
+    char* cmd2[MAX_ARGS];
+    int pipe_detected = 0;
+    
+    int idx1 = 0;
+    int idx2 = 0;
+
+    for (int i = 0; command[i] != NULL; i++) {
+        if (strcmp(command[i], "|") == 0) {
+            pipe_detected = 1;
+            continue; 
+        }
+        
+        if (pipe_detected == 0) {
+            cmd1[idx1] = command[i];
+            idx1++;
+        }
+        else {
+            cmd2[idx2] = command[i];
+            idx2++;
+        }
+    }
+    cmd1[idx1] = NULL;
+    cmd2[idx2] = NULL;
+
+    if (pipe_detected && idx1 > 0 && idx2 > 0) {
+        execute_pipe(cmd1, cmd2);
+    } else {
+        printf("Error: Pipe /n");
+        exit(EXIT_SUCCESS);
+    }
+}
+
 /*
 The function finds '<' or '>', opens the file, uses dup2 to redirect STDIN/STDOUT, and clears the args.
 */
@@ -135,7 +211,7 @@ The function finds '<' or '>', opens the file, uses dup2 to redirect STDIN/STDOU
 void redirect_and_filter_args(char** args){
 
     for (int i = 0; args[i]!=NULL;i++){
-                
+        //checks redirection
         if(strcmp(args[i],"<")==0){
             if (args[i+1] == NULL) {
                 print("Erreur: pas de fichier après <\n");
@@ -177,9 +253,6 @@ void redirect_and_filter_args(char** args){
         close(fd);
 
         }
-        //question 8 
-
-
 
             }
 
@@ -191,7 +264,7 @@ void execute_prompt(char** command){
     if (command[0] == NULL) {
         return; 
     }
-    clock_gettime(CLOCK_MONOTONIC,&start);
+    clock_gettime(CLOCK_MONOTONIC , &start);
     
     if (strcmp(command[0], "exit") == 0) {
         print("Bye bye...\n");
@@ -205,6 +278,10 @@ void execute_prompt(char** command){
         } 
         else if (pid == 0) {
             // ===(CHILD) ===
+            if(check_pipe(command)){
+                build_and_execute_pipe(command);
+                exit(EXIT_FAILURE); 
+            }
             redirect_and_filter_args(command);
             execvp(command[0], command);
             perror("Erreur d'execution");
