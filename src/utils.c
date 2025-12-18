@@ -24,7 +24,7 @@ int process_entry(char* buffer){
         print("Erreur de lecture\n");
         exit(EXIT_FAILURE);
     }
-    // Terminates the process if the Enter key is detected
+
     if (buffer[ret - 1] == '\n') {
         buffer[ret - 1] = '\0';
 
@@ -84,7 +84,7 @@ char* build_prompt() {
                 (end.tv_nsec - start.tv_nsec) / 1000000.0;
 
 
-        // "enseash[" + "EXIT:" + number + "]%"
+        // "enseash[" + "EXIT:" + number + | + number ms "]%"
         int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s%.1f%s", 
                            first_part, exit_str, result_of_the_child,middle_part,time_diff_ms, last_part);
         
@@ -104,7 +104,7 @@ char* build_prompt() {
                 (end.tv_nsec - start.tv_nsec) / 1000000.0;
 
 
-        // Construct the final string safely: "enseash[" + "SIG:" + number + "]%"
+        // Construct the final string safely: "enseash[" + "SIG:" + number + | + number ms"]%"
         int len = snprintf(buffer, MAX_STATUS_MSG_SIZE, "%s%s%d%s%.1f%s", 
                            first_part, sig_str, process_killer,middle_part,time_diff_ms, last_part);
 
@@ -214,7 +214,7 @@ The function finds '<' or '>', opens the file, uses dup2 to redirect STDIN/STDOU
 void redirect_and_filter_args(char** args){
 
     for (int i = 0; args[i]!=NULL;i++){
-        //checks redirection
+        
         if(strcmp(args[i],"<")==0){
             if (args[i+1] == NULL) {
                 print("Erreur: pas de fichier après <\n");
