@@ -6,8 +6,8 @@ int status;
 int main(int argc, char *argv[]){
     char buffer[BUFFER_SIZE];
     char* args[MAX_ARGS];
-
-    print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
+    
+    greetings();
 
       while (1) {
     

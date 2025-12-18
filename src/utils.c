@@ -7,6 +7,9 @@ void print(char* str){
     write(STDOUT_FILENO, str, strlen(str));
 }
 
+void greetings(){
+    print("Bienvenue dans le Shell ENSEA.\nPour quitter, tapez 'exit'.\n");
+}
 
 int process_entry(char* buffer){
     ssize_t ret = read(STDIN_FILENO, buffer, BUFFER_SIZE - 1); 
